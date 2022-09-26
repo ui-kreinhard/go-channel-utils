@@ -39,3 +39,8 @@ func (f *Filter[T]) Filter(filerElement FilterElement[T]) *Filter[T] {
 func (f *Filter[T]) Mux() *ChannelMultiplexer[T] {
 	return NewChannelMultiplexer(f.Out())
 }
+
+func (f *Filter[T]) ForEach(forEach ForEachElement[T]) *ForEach[T] {
+	return NewForEach[T](f.outChannel, forEach)
+}
+
