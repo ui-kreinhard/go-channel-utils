@@ -36,7 +36,7 @@ func main() {
 	}()
 
 	mux := channelutils.NewMap[int, int](randomNumbers, &Methods{}).
-		Filter(&Methods{}).Mux()
+		Filter(&Methods{}).Debug(":8081", channelutils.StopOnMessage).Mux()
 
 	mux.Each(&Methods{})
 	sinks.NewWebsocketSink(mux.Out(), "localhost:8080")
