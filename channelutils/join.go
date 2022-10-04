@@ -3,10 +3,10 @@ package channelutils
 import "log"
 
 type Join[T any, U any, V any] struct {
-	fast       <-chan T
-	slow       <-chan U
-	outChannel chan V
-	join       JoinElement[T, U, V]
+	fast <-chan T
+	slow <-chan U
+	OutOperations[V]
+	join JoinElement[T, U, V]
 
 	inCurrent1 *T
 	inCurrent2 *U
@@ -21,7 +21,7 @@ func NewJoin[T any, U any, V any](fast <-chan T, slow <-chan U, joinElement Join
 	ret := &Join[T, U, V]{
 		fast,
 		slow,
-		make(chan V),
+		*NewOutOperations[V](),
 		joinElement,
 		nil,
 		nil,
@@ -32,7 +32,7 @@ func NewJoin[T any, U any, V any](fast <-chan T, slow <-chan U, joinElement Join
 }
 
 func (j *Join[T, U, V]) SlowIsMaster() *Join[T, U, V] {
-	j.onlyOnSlow = true	
+	j.onlyOnSlow = true
 	return j
 }
 
@@ -77,16 +77,4 @@ func (j *Join[T, U, V]) commit() {
 
 		j.outChannel <- j.join.Join(in1, in2)
 	}
-}
-
-func (j *Join[T, U, V]) Filter(filerElement FilterElement[V]) *Filter[V] {
-	return NewFilter(j.Out(), filerElement)
-}
-
-func (j *Join[T, U, V]) Mux() *ChannelMultiplexer[V] {
-	return NewChannelMultiplexer(j.Out())
-}
-
-func (j *Join[T, U, V]) Each(eachElement ForEachElement[V]) *ForEach[V] {
-	return NewForEach(j.Out(), eachElement)
 }

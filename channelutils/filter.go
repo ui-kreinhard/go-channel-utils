@@ -1,15 +1,15 @@
 package channelutils
 
 type Filter[T any] struct {
+	OutOperations[T]
 	inChannel     <-chan T
-	outChannel    chan T
 	filterElement FilterElement[T]
 }
 
 func NewFilter[T any](inChannel <-chan T, filterElement FilterElement[T]) *Filter[T] {
 	ret := &Filter[T]{
+		*NewOutOperations[T](),
 		inChannel,
-		make(chan T),
 		filterElement,
 	}
 	go ret.listen()
@@ -27,20 +27,3 @@ func (f *Filter[T]) listen() {
 		}
 	}
 }
-
-func (f *Filter[T]) Out() <-chan T {
-	return f.outChannel
-}
-
-func (f *Filter[T]) Filter(filerElement FilterElement[T]) *Filter[T] {
-	return NewFilter(f.Out(), filerElement)
-}
-
-func (f *Filter[T]) Mux() *ChannelMultiplexer[T] {
-	return NewChannelMultiplexer(f.Out())
-}
-
-func (f *Filter[T]) ForEach(forEach ForEachElement[T]) *ForEach[T] {
-	return NewForEach[T](f.outChannel, forEach)
-}
-

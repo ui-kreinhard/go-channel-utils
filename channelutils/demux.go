@@ -2,13 +2,13 @@ package channelutils
 
 type Demux[T any] struct {
 	inChannels []chan T
-	outChannel chan T
+	OutOperations[T]
 }
 
 func NewDemux[T any](inChannels []chan T) *Demux[T] {
 	ret := &Demux[T]{
 		inChannels,
-		make(chan T),
+		*NewOutOperations[T](),
 	}
 	go ret.listen()
 	return ret
@@ -24,8 +24,4 @@ func (d *Demux[T]) shovel(channel <-chan T) {
 	for msg := range channel {
 		d.outChannel <- msg
 	}
-}
-
-func (d *Demux[T]) Out() <-chan T {
-	return d.outChannel
 }
