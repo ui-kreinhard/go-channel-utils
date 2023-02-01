@@ -1,7 +1,5 @@
 package channelutils
 
-import "log"
-
 type Join[T any, U any, V any] struct {
 	fast <-chan T
 	slow <-chan U
@@ -61,7 +59,6 @@ func (j *Join[T, U, V]) listenOnFast() {
 
 func (j *Join[T, U, V]) listenOnSlow() {
 	for element2 := range j.slow {
-		log.Println(j.inCurrent2)
 		j.inCurrent2 = &element2
 		j.commit()
 	}
